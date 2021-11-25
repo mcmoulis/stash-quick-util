@@ -8,6 +8,7 @@ import io.restassured.path.json.JsonPath;
 import io.restassured.specification.RequestSpecification;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,7 @@ import java.util.Scanner;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.springframework.util.StopWatch;
+import org.springframework.util.StringUtils;
 
 public class StashHelper {
 
@@ -26,6 +28,7 @@ public class StashHelper {
   private static final String NEW_LINE = "\n";
 
   private static String stashServer;
+  private static String projectName;
   private static String localDir;
 
   private static RequestSpecification getBaseRequest(String username, String password) {
@@ -46,6 +49,8 @@ public class StashHelper {
     String password = scanner.nextLine();
     System.out.print("Bitbucket url:");
     stashServer = scanner.nextLine().trim();
+    System.out.print("Bitbucket project (all project if no value):");
+    projectName = scanner.nextLine().trim();
     System.out.print("Local directory:");
     localDir = scanner.nextLine().trim();
 
@@ -53,22 +58,28 @@ public class StashHelper {
     stopWatch.start("Download projects list");
 
     RequestSpecification request = getBaseRequest(username, password);
-    JsonPath projectsJson = request
-        .queryParam("start", 0)
-        .queryParam("limit", PAGE_SIZE)
-        .get(PROJECTS_API_URI)
-        .body()
-        .jsonPath();
+    int projectsCount = 0;
+    List<Project> projectList = new ArrayList<>();
+    if (StringUtils.hasText(projectName)) {
+      projectsCount = 1;
+      projectList.add(new Project(projectName));
+    } else {
+      JsonPath projectsJson = request
+          .queryParam("start", 0)
+          .queryParam("limit", PAGE_SIZE)
+          .get(PROJECTS_API_URI)
+          .body()
+          .jsonPath();
 
-    int projectsCount = projectsJson.get("values.size()");
+      projectsCount = projectsJson.get("values.size()");
+      projectList = IntStream.range(0, projectsCount)
+          .mapToObj(index ->
+              new Project(projectsJson.get("values[" + index + "].key"))
+          )
+          .collect(Collectors.toList());
+    }
+
     System.out.println("Total accessible projects: " + projectsCount);
-    List<Project> projectList = IntStream.range(0, projectsCount)
-        .mapToObj(index ->
-            new Project(projectsJson.get("values[" + index + "].key"),
-                projectsJson.get("values[" + index + "].links.self.href[0]"))
-        )
-        .collect(Collectors.toList());
-
     StringBuffer cloneScriptBuffer = new StringBuffer();
     StringBuffer pullScriptBuffer = new StringBuffer();
 
@@ -141,12 +152,10 @@ public class StashHelper {
   private static class Project {
 
     public String key;
-    public String url;
     public Map<String, String> repoCloneList;
 
-    public Project(String key, String url) {
+    public Project(String key) {
       this.key = key;
-      this.url = url;
       repoCloneList = new HashMap<>();
     }
   }
