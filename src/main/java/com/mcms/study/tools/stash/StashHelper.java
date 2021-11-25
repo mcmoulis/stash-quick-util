@@ -128,11 +128,12 @@ public class StashHelper {
   }
 
   private static void prepareCloneScript(StringBuffer cloneScriptBuffer, Project project) {
+    final String projectName = project.key.toLowerCase();
     project.repoCloneList.entrySet().forEach(entry ->
         cloneScriptBuffer
-            .append("rem ").append(project.key).append("\\").append(entry.getKey()).append(NEW_LINE)
-            .append("mkdir ").append(localDir).append(project.key).append(NEW_LINE)
-            .append("cd ").append(localDir).append(project.key).append(NEW_LINE)
+            .append("rem ").append(projectName).append("\\").append(entry.getKey()).append(NEW_LINE)
+            .append("mkdir ").append(localDir).append(projectName).append(NEW_LINE)
+            .append("cd ").append(localDir).append(projectName).append(NEW_LINE)
             .append("git clone ").append(entry.getValue()).append(NEW_LINE)
             .append(NEW_LINE).append(NEW_LINE)
     );
