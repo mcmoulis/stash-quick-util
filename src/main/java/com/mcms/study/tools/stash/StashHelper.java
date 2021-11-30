@@ -143,7 +143,8 @@ public class StashHelper {
     project.repoCloneList.entrySet().forEach(entry ->
         pullScriptBuffer
             .append("rem ").append(project.key).append("\\").append(entry.getKey()).append(NEW_LINE)
-            .append("cd ").append(localDir).append(project.key).append(NEW_LINE)
+            .append("cd ").append(localDir).append(project.key).append("\\").append(entry.getKey())
+            .append(NEW_LINE)
             .append("git fetch --prune --tags --progress \"origin\"").append(NEW_LINE)
             .append("git pull --progress \"origin\"").append(NEW_LINE)
             .append(NEW_LINE).append(NEW_LINE)
