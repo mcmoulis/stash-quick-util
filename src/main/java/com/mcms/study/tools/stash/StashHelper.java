@@ -5,6 +5,8 @@ import io.restassured.config.HttpClientConfig;
 import io.restassured.config.SSLConfig;
 import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
+import io.restassured.response.Response;
+import io.restassured.response.ResponseBody;
 import io.restassured.specification.RequestSpecification;
 import org.springframework.util.StopWatch;
 import org.springframework.util.StringUtils;
@@ -105,18 +107,20 @@ public class StashHelper {
                         IntStream.range(0, repoCount)
                                 .forEach(index -> {
                                             String repoName = reposJsonPath.get("values[" + index + "].name");
+                                            ResponseBody<Response> defaultRepoResponse = request
+                                                    .pathParam("projectName", project.key)
+                                                    .pathParam("repoName", repoName)
+                                                    .queryParam("start", 0)
+                                                    .queryParam("limit", PAGE_SIZE)
+                                                    .get(DEF_BRANCH_API_URI);
                                             project.repos.put(
                                                     repoName,
                                                     new Repo(reposJsonPath.get("values[" + index
                                                             + "].links.clone.find{it.name == 'ssh'}.href"),
-                                                            request
-                                                                    .pathParam("projectName", project.key)
-                                                                    .pathParam("repoName", repoName)
-                                                                    .queryParam("start", 0)
-                                                                    .queryParam("limit", PAGE_SIZE)
-                                                                    .get(DEF_BRANCH_API_URI)
-                                                                    .body()
-                                                                    .jsonPath().get("displayId"))
+                                                            defaultRepoResponse != null
+                                                                    && !defaultRepoResponse.asString().isEmpty()
+                                                                    ? defaultRepoResponse.jsonPath().get("displayId")
+                                                                    : "master")
                                             );
                                         }
                                 );
