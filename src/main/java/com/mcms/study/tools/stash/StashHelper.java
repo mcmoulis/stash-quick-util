@@ -47,16 +47,29 @@ public class StashHelper {
 
     public static void main(String[] args) throws Exception {
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Username:");
-        String username = scanner.nextLine();
+
+        String username = System.getProperty("user.name");
+        System.out.println("Username:" + username);
+
         System.out.print("Password:");
-        String password = scanner.nextLine();
+        String password = scanner.reset().nextLine();
+
         System.out.print("Bitbucket url:");
-        stashServer = scanner.nextLine().trim();
+        stashServer = scanner.reset().nextLine().trim();
+
         System.out.print("Bitbucket project (all project if no value):");
-        projectName = scanner.nextLine().trim();
+        projectName = scanner.reset().nextLine().trim();
+
         System.out.print("Local directory:");
-        localDir = scanner.nextLine().trim();
+        localDir = scanner.reset().nextLine().trim();
+
+        System.out.printf("""
+                \nUsername: %s
+                Password: %s
+                Bitbucket URL: %s
+                Project Name: %s
+                Local Directory: %s
+                \n""", username, password, stashServer, projectName, localDir);
 
         StopWatch stopWatch = new StopWatch();
         stopWatch.start("Download projects list");
@@ -139,7 +152,7 @@ public class StashHelper {
         Files.write(Paths.get(projectName + "_git_pull_script.bat"), pullScriptBuffer.toString().getBytes());
 
         stopWatch.stop();
-        System.out.println("Total time taken in milliseconds: " + stopWatch.getTotalTimeMillis());
+        System.out.println("Total time taken in milliseconds: " + stopWatch.getTotalTimeSeconds());
         System.out.println("Details: \n" + stopWatch.prettyPrint());
     }
 
