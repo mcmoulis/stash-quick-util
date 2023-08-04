@@ -167,8 +167,8 @@ public class StashHelper {
         stopWatch.stop();
         stopWatch.start("Generate scritps");
 
-        Files.write(Paths.get(projectName + "_git_clone_script.bat"), cloneScriptBuffer.toString().getBytes());
-        Files.write(Paths.get(projectName + "_git_pull_script.bat"), pullScriptBuffer.toString().getBytes());
+        Files.write(Paths.get("git-clone-" + projectName + ".bat"), cloneScriptBuffer.toString().getBytes());
+        Files.write(Paths.get("git-pull-" + projectName + ".bat"), pullScriptBuffer.toString().getBytes());
 
         stopWatch.stop();
         System.out.println("Total time taken in milliseconds: " + stopWatch.getTotalTimeSeconds());
