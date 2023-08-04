@@ -66,7 +66,7 @@ public class StashHelper {
         System.out.print("Bitbucket url:");
         if (config.containsKey("stashServer")) {
             stashServer = config.getProperty("stashServer");
-            System.out.print(stashServer);
+            System.out.println(stashServer);
         } else {
             stashServer = scanner.reset().nextLine().trim();
         }
@@ -77,7 +77,7 @@ public class StashHelper {
         System.out.print("Local directory:");
         if (config.containsKey("localDir")) {
             localDir = config.getProperty("localDir");
-            System.out.print(localDir);
+            System.out.println(localDir);
         } else {
             localDir = scanner.reset().nextLine().trim();
         }
