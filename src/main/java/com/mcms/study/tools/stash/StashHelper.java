@@ -8,6 +8,8 @@ import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import io.restassured.response.ResponseBody;
 import io.restassured.specification.RequestSpecification;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.util.StopWatch;
 import org.springframework.util.StringUtils;
 
@@ -16,6 +18,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Scanner;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -48,6 +51,12 @@ public class StashHelper {
     public static void main(String[] args) throws Exception {
         Scanner scanner = new Scanner(System.in);
 
+        Properties config = new Properties();
+        ClassPathResource resource = new ClassPathResource("config.properties");
+        if (resource.exists()) {
+            PropertiesLoaderUtils.fillProperties(config, resource);
+        }
+
         String username = System.getProperty("user.name");
         System.out.println("Username:" + username);
 
@@ -55,13 +64,23 @@ public class StashHelper {
         String password = scanner.reset().nextLine();
 
         System.out.print("Bitbucket url:");
-        stashServer = scanner.reset().nextLine().trim();
+        if (config.containsKey("stashServer")) {
+            stashServer = config.getProperty("stashServer");
+            System.out.print(stashServer);
+        } else {
+            stashServer = scanner.reset().nextLine().trim();
+        }
 
         System.out.print("Bitbucket project (all project if no value):");
         projectName = scanner.reset().nextLine().trim();
 
         System.out.print("Local directory:");
-        localDir = scanner.reset().nextLine().trim();
+        if (config.containsKey("localDir")) {
+            localDir = config.getProperty("localDir");
+            System.out.print(localDir);
+        } else {
+            localDir = scanner.reset().nextLine().trim();
+        }
 
         System.out.printf("""
                 \nUsername: %s
@@ -203,4 +222,5 @@ public class StashHelper {
             this.defaultBranch = defaultBranch;
         }
     }
+
 }
