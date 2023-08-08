@@ -61,7 +61,13 @@ public class StashHelper {
         System.out.println("Username:" + username);
 
         System.out.print("Password:");
-        String password = scanner.reset().nextLine();
+        String password = null;
+        if (System.console() != null) {
+            password = new String(System.console().readPassword());
+        }
+        if (password == null) {
+            password = scanner.reset().nextLine();
+        }
 
         System.out.print("Bitbucket url:");
         if (config.containsKey("stashServer")) {
@@ -157,7 +163,7 @@ public class StashHelper {
                 });
 
         stopWatch.stop();
-        stopWatch.start("Generate scritps");
+        stopWatch.start("Generate scripts");
 
         Files.write(Paths.get("git-clone-" + projectName + ".bat"), cloneScriptBuffer.toString().getBytes());
         Files.write(Paths.get("git-pull-" + projectName + ".bat"), pullScriptBuffer.toString().getBytes());
@@ -165,6 +171,7 @@ public class StashHelper {
         stopWatch.stop();
         System.out.println("Total time taken in milliseconds: " + stopWatch.getTotalTimeSeconds());
         System.out.println("Details: \n" + stopWatch.prettyPrint());
+        System.exit(1);
     }
 
     private static void prepareCloneScript(StringBuffer cloneScriptBuffer, Project project) {
