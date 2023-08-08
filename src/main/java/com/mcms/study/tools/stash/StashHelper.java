@@ -82,14 +82,6 @@ public class StashHelper {
             localDir = scanner.reset().nextLine().trim();
         }
 
-        System.out.printf("""
-                \nUsername: %s
-                Password: %s
-                Bitbucket URL: %s
-                Project Name: %s
-                Local Directory: %s
-                \n""", username, password, stashServer, projectName, localDir);
-
         StopWatch stopWatch = new StopWatch();
         stopWatch.start("Download projects list");
 
